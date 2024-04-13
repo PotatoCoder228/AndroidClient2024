@@ -92,8 +92,8 @@ private fun PasswordField(modifier: Modifier, placeholder: String = "Password") 
 
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
-private fun SignInButton(
-    modifier: Modifier, navController: NavController, placeholder: String = "Sign In"
+private fun AuthButton(
+    modifier: Modifier, navController: NavController, placeholder: String = "Authorization"
 ) {
     val text by remember { mutableStateOf(placeholder) }
     //val alert = false
@@ -111,15 +111,15 @@ private fun SignInButton(
     Button(
         onClick = {
             try {
-                GlobalScope.launch {
-                    credentials.setToken(
-                        sendSignInRequest(
-                            credentials.getLogin(), credentials.getPassword()
-                        ).token
-                    )
-                    msg = sendSignInRequest(credentials.getLogin(), credentials.getPassword()).token
-                }
-                navController.navigate("Home")
+//                GlobalScope.launch {
+//                    credentials.setToken(
+//                        sendSignInRequest(
+//                            credentials.getLogin(), credentials.getPassword()
+//                        ).token
+//                    )
+//                    msg = sendSignInRequest(credentials.getLogin(), credentials.getPassword()).token
+//                }
+                navController.navigate("SignIn")
             } catch (e: Throwable) {
                 //alert TODO
             }
@@ -131,18 +131,19 @@ private fun SignInButton(
 
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
-private fun RegistrationButton(
+
+private fun SignUpButton(
     modifier: Modifier,
     navController: NavController,
-    placeholder: String = "Registration"
+    placeholder: String = "Sign Up"
 ) {
     var response: HttpResponse
     Button(
         onClick = {
-//            GlobalScope.launch {
-//                response = sendSignUpRequest(credentials.getLogin(), credentials.getPassword())
-//            }
-            navController.navigate("SignUp")
+            GlobalScope.launch {
+                response = sendSignUpRequest(credentials.getLogin(), credentials.getPassword())
+            }
+            navController.navigate("SignIn")
         }, modifier = modifier, colors = ButtonDefaults.buttonColors(OutlinedButtonBackgroundColor)
     ) {
         Text(placeholder)
@@ -150,7 +151,7 @@ private fun RegistrationButton(
 }
 
 @Composable
-fun AuthBox(navController: NavController) {
+fun RegistrationBox(navController: NavController) {
     Box {
         Box(
             modifier = Modifier
@@ -165,7 +166,7 @@ fun AuthBox(navController: NavController) {
                 )
         ) {
             Text(
-                "Smart Home",
+                "Registration",
                 Modifier
                     .align(Alignment.TopCenter)
                     .padding(top = 20.dp),
@@ -187,14 +188,14 @@ fun AuthBox(navController: NavController) {
                     .size(200.dp, 30.dp)
                     .align(Alignment.Center)
             )
-            SignInButton(
+            SignUpButton(
                 Modifier
                     .align(Alignment.BottomCenter)
                     .size(150.dp, 35.dp)
                     .offset(y = (-75).dp),
                 navController
             )
-            RegistrationButton(
+            AuthButton(
                 Modifier
                     .align(Alignment.BottomCenter)
                     .size(150.dp, 35.dp)
@@ -205,9 +206,9 @@ fun AuthBox(navController: NavController) {
 }
 
 @Composable
-fun AuthPage(navController: NavController) {
+fun RegistrationPage(navController: NavController) {
     Surface(modifier = Modifier.fillMaxSize(), color = ApplicationBackgroundColor) {
-        AuthBox(navController)
+        RegistrationBox(navController)
     }
 }
 

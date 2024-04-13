@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 var credentials= Credentials()
 
 @Volatile
-var errorMsg = "Test"
+var errorMsg = ""
 
 val BASE_URL="http://172.30.217.224:8080/"
 

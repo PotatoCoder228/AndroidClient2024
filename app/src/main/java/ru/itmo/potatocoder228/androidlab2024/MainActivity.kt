@@ -6,17 +6,25 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -55,12 +63,17 @@ import ru.itmo.potatocoder228.androidlab2024.ui.theme.AuthPage
 import ru.itmo.potatocoder228.androidlab2024.ui.theme.BoxBackgroundColor
 import ru.itmo.potatocoder228.androidlab2024.ui.theme.Home
 import ru.itmo.potatocoder228.androidlab2024.ui.theme.HomeNameColor
+import ru.itmo.potatocoder228.androidlab2024.ui.theme.ListItemNameColor
+import ru.itmo.potatocoder228.androidlab2024.ui.theme.LogoutButtonColor
 import ru.itmo.potatocoder228.androidlab2024.ui.theme.OutlinedButtonBackgroundColor
+import ru.itmo.potatocoder228.androidlab2024.ui.theme.RegistrationPage
+import ru.itmo.potatocoder228.androidlab2024.ui.theme.SetHomeInfoColor
 import ru.itmo.potatocoder228.androidlab2024.ui.theme.UpdateHomeInfoColor
 import ru.itmo.potatocoder228.androidlab2024.ui.theme.credentials
 import ru.itmo.potatocoder228.androidlab2024.ui.theme.getHomeRequest
 import ru.itmo.potatocoder228.androidlab2024.ui.theme.home
 import ru.itmo.potatocoder228.androidlab2024.ui.theme.sendSignUpRequest
+import ru.itmo.potatocoder228.androidlab2024.ui.theme.setHomeRequest
 
 val client = HttpClient(CIO) { install(ContentNegotiation) { json() } }
 
@@ -100,6 +113,10 @@ fun App(
             AuthPage(navController)
         }
 
+        composable("SignUp") {
+            RegistrationPage(navController)
+        }
+
         composable("Home") {
             HomePage(navController)
         }
@@ -125,15 +142,64 @@ fun HomeBox(navController: NavController) {
                 .align(Alignment.Center)
                 .size(500.dp, 700.dp)
         ) {
-            HomeNameField(Modifier.align(Alignment.TopCenter), rememberedHome)
-            Checkbox(checked = rememberedLamp, onCheckedChange = {
-                home.lampochka= !home.lampochka
-                rememberedLamp = home.lampochka
-            })
             Button(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(150.dp, 35.dp),
+                    .align(Alignment.TopEnd),
+                onClick = {
+                    credentials.clear()
+                    navController.navigate("SignIn")
+                }, colors = ButtonDefaults.buttonColors(LogoutButtonColor)
+            ) {
+                Icon(Icons.Filled.ExitToApp, null, modifier.size(25.dp))
+            }
+            HomeNameField(
+                Modifier
+                    .align(Alignment.TopCenter),
+                rememberedHome
+            )
+            Box(
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 50.dp)
+                    .size(250.dp, 450.dp)
+                    .background(BoxBackgroundColor, shape = RoundedCornerShape(25.dp))
+                    .border(
+                        BorderStroke(
+                            width = 4.dp,
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    Color(0xFFD3D2FA),
+                                    Color(0xFFD3D2FA)
+                                )
+                            )
+                        ), shape = RoundedCornerShape(25.dp)
+                    )
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Row(
+                    Modifier
+                        .size(200.dp, 100.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = rememberedLamp, onCheckedChange = {
+                            home.lampochka = !home.lampochka
+                            rememberedLamp = home.lampochka
+                        }
+                    )
+                    Spacer(Modifier.size(6.dp))
+                    Text(
+                        "Light", color = ListItemNameColor,
+                        fontFamily = FontFamily.Serif,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
+            }
+            Button(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .size(150.dp, 35.dp)
+                    .offset(y = (-150).dp),
                 onClick = {
                     try {
                         GlobalScope.launch {
@@ -149,11 +215,34 @@ fun HomeBox(navController: NavController) {
             ) {
                 Text("Update")
             }
+            Button(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .size(150.dp, 35.dp)
+                    .offset(y = (-100).dp),
+                onClick = {
+                    try {
+                        GlobalScope.launch {
+                            response = setHomeRequest()
+                        }
+                    } catch (e: Throwable) {
+
+                    }
+                }, colors = ButtonDefaults.buttonColors(SetHomeInfoColor)
+            ) {
+                Text("Set")
+            }
         }
     }
 }
 
 @Composable
 fun HomeNameField(modifier: Modifier, rememberedHome: Home) {
-    Text(rememberedHome.description, color = HomeNameColor)
+    Text(
+        rememberedHome.description,
+        fontSize = 24.sp,
+        modifier = modifier,
+        color = HomeNameColor,
+        fontFamily = FontFamily.Serif
+    )
 }

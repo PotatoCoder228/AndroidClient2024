@@ -40,9 +40,10 @@ suspend fun getHomeRequest(): HttpResponse{
     }
 }
 
-//suspend fun setHomeRequest(): HttpResponse{
-//    return client.post(HOUSE_URL){
-//        headers.append("Authorization", credentials.getToken())
-//        setBody()
-//    }
-//}
+suspend fun setHomeRequest(): HttpResponse{
+    return client.post(HOUSE_URL){
+        headers.append("Authorization", credentials.getToken())
+        contentType(ContentType.Application.Json)
+        setBody(home)
+    }
+}
